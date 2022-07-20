@@ -1,0 +1,155 @@
+----------------------------------------------------Q1-----------------------------------------------------
+
+----------------------------------------1------------------------------------------------------------------
+
+MariaDB [hr]> select salary from employees where salary = (select max(salary) from employees where salary <(select max(salary) from employees where salary <
+    -> (select max(salary) from employees)));
++----------+
+| salary   |
++----------+
+| 14000.00 |
++----------+
+1 row in set (0.001 sec)
+
+-----------------------------------------------q2------------------------------------------------------------
+MariaDB [hr]> CREATE VIEW EMP_WORKED AS
+    -> select employee_id,first_name,last_name,job_id,max_salary from employees
+    -> natural join jobs where max_salary=(select max(max_salary) from jobs);
+Query OK, 0 rows affected (0.005 sec)
+
+MariaDB [hr]> SELECT * FROM EMP_WORKED;
++-------------+------------+-----------+---------+------------+
+| employee_id | first_name | last_name | job_id  | max_salary |
++-------------+------------+-----------+---------+------------+
+|         100 | Steven     | King      | AD_PRES |      40000 |
++-------------+------------+-----------+---------+------------+
+1 row in set (0.003 sec)
+
+
+
+
+q3--------------------------------------------------------------
+
+select concat("department_id",departmentid is IN location)
+
+----------------------------------------------q4-------------------------------------------------------
+
+MariaDB [hr]> select * from employees  where salary > (select salary from employees where first_name = 'peter' or  (select salary from employees where first_name = 'Lisa'));
+ERROR 1242 (21000): Subquery returns more than 1 row
+
+
+----------------------------------------------q5----------------------------------------------------
+
+MariaDB [hr]> select first_name,last_name,department_name,department_id from employees natural join departments GROUP BY employees.department_id HAVING salary > AVG(salary);
+ERROR 1054 (42S22): Unknown column 'salary' in 'having clause'
+
+
+-----------------------------------------q6---------------------------------------------------------
+
+MariaDB [hr]> select first_name,last_name,department_name,department_id from employees natural join departments GROUP BY employees.department_id HAVING employees.salary = (select MAX(salary) from employees);
+ERROR 1054 (42S22): Unknown column 'employees.salary' in 'having clause'
+
+---------------------------------------------q7------------------------------------------------------
+
+MariaDB [hr]> select first_name,last_name,job_title from employees natural join departments natural join jobs GROUP BY  employees.department_id HAVING department_id = 20;
++------------+-----------+--------------------------+
+| first_name | last_name | job_title                |
++------------+-----------+--------------------------+
+| Pat        | Fay       | Marketing Representative |
++------------+-----------+--------------------------+
+
+------------------------------------------q8-----------------------------------------------------
+
+MariaDB [hr]> select first_name,last_name,job_title from employees natural join departments natural join jobs GROUP BY  employees.department_id HAVING
+    -> (select job_id where department_id = 20 and department_id=50);
+
+
+
+
+---------------------------------------------q9----------------------------------------------------
+
+MariaDB [hr]> select employee_id,first_name,last_name from employees natural join emp_details_view natural join departments where emp_details_view.city ='south san francisco';
+Empty set (0.001 sec)
+
+
+------------------------------------------q10-----------------------------------------------------
+
+MariaDB [hr]> select employee_id,first_name,last_name from employees natural join emp_details_view natural join departments where department_id= (select department_id from departments where city ='south san francisco');
+ERROR 1242 (21000): Subquery returns more than 1 row
+
+
+-------------------------------------------------------q11--------------------------------------------
+
+
+MariaDB [hr]> select employee_id,job_id,department_id from job_history natural join departments natural join employees;
+Empty set (0.001 sec)
+
+--------------------------------------------------12
+
+MariaDB [hr]> select department_name,count(employee_id) from employees natural join group by department_id having count(employee_id)<=2;
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'group by department_id having count(employee_id)<=2' at line 1
+
+
+---------------------------------------13
+
+MariaDB [hr]> select first_name , job_title,department_name,city,country_name,relgion_name from employees natural join job_history natural join departments natural join location natural join countries natural join regions;
+ERROR 1146 (42S02): Table 'hr.location' doesn't exist
+MariaDB [hr]>
+
+
+-------------------------------------------16
+MariaDB [hr]> select department_id,location_id,department_name from locations natural join departments;
++---------------+-------------+----------------------+
+| department_id | location_id | department_name      |
++---------------+-------------+----------------------+
+|            10 |        1700 | Administration       |
+|            20 |        1800 | Marketing            |
+|            30 |        1700 | Purchasing           |
+|            40 |        2400 | Human Resources      |
+|            50 |        1500 | Shipping             |
+|            60 |        1400 | IT                   |
+|            70 |        2700 | Public Relations     |
+|            80 |        2500 | Sales                |
+|            90 |        1700 | Executive            |
+|           100 |        1700 | Finance              |
+|           110 |        1700 | Accounting           |
+|           120 |        1700 | Treasury             |
+|           130 |        1700 | Corporate Tax        |
+|           140 |        1700 | Control And Credit   |
+|           150 |        1700 | Shareholder Services |
+|           160 |        1700 | Benefits             |
+|           170 |        1700 | Manufacturing        |
+|           180 |        1700 | Construction         |
+|           190 |        1700 | Contracting          |
+|           200 |        1700 | Operations           |
+|           210 |        1700 | IT Support           |
+|           220 |        1700 | NOC                  |
+|           230 |        1700 | IT Helpdesk          |
+|           240 |        1700 | Government Sales     |
+|           250 |        1700 | Retail Sales         |
+|           260 |        1700 | Recruiting           |
+|           270 |        1700 | Payroll              |
++---------------+-------------+----------------------+
+27 rows in set (0.000 sec)
+
+
+---------------------------------------14
+
+MariaDB [hr]> select min(salary) from job_history natural join departments natural join employees natural join jobs group by department_id having min_salary<5000;
+ERROR 1054 (42S22): Unknown column 'min_salary' in 'having clause'
+
+
+
+
+
+
+Q2--------------------
+
+DELIMITER $$
+CREATE PROCEDURE my_proc_IN (IN var1 INT,IN var2 char,IN var3 char)
+BEGIN
+Insert into regions values(var1,var2);
+Insert into countries values(var1,var2,var3);
+END$$
+DELIMITER ;
+call my_proc_IN(1,zeeshan,helo,zafar);

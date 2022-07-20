@@ -1,0 +1,243 @@
+                                  Name:Zeeshan Zafar
+                                  Rollno:p200569
+                                  Department:BS(CS)
+                                  Section:A
+
+
+---------------------------------------------====Q1====-----------------------------------------------------
+
+MariaDB [guest_house]> select * from hotel where hotelname like '%__t%' ORDER BY hotelname desc;
++---------+-----------+--------+
+| hotelno | hotelname | city   |
++---------+-----------+--------+
+| fb02    | Watergate | Paris  |
+| dc01    | Latham    | Berlin |
++---------+-----------+--------+
+2 rows in set (0.001 sec)
+
+
+
+---------------------------------------------====Q2====-----------------------------------------------------
+
+
+MariaDB [guest_house]> select hotel.hotelno,hotelname,roomno,type,price,guestno,guestname,guestaddress
+    ->  from hotel NATURAL JOIN room NATURAL JOIN booking NATURAL JOIN guest
+    ->  WHERE guestaddress LIKE '%Glasgow' AND guestname LIKE 'Tony%' OR guestname LIKE '%Farrel';
++---------+-----------+--------+--------+-------+---------+--------------+----------------------+
+| hotelno | hotelname | roomno | type   | price | guestno | guestname    | guestaddress         |
++---------+-----------+--------+--------+-------+---------+--------------+----------------------+
+| dc01    | Latham    |   1001 | double | 30.00 |   10007 | Tony Shaw    | 12 Park Pl, Glasgow  |
+| fb01    | Grosvenor |    501 | single | 19.00 |   10005 | Carol Farrel | 6 Achray St, Glasgow |
++---------+-----------+--------+--------+-------+---------+--------------+----------------------+
+2 rows in set (0.001 sec)
+
+
+
+
+---------------------------------------------====Q3====-----------------------------------------------------
+
+
+MariaDB [guest_house]> select hotel.hotelno,hotelname,roomno,price from hotel NATURAL JOIN room
+    -> WHERE price = (select MAX(price) from room WHERE price < (select MAX(price) from room));
++---------+---------------+--------+-------+
+| hotelno | hotelname     | roomno | price |
++---------+---------------+--------+-------+
+| ch01    | Omni Shoreham |   1101 | 59.99 |
++---------+---------------+--------+-------+
+1 row in set (0.001 sec)
+
+
+
+
+
+
+
+---------------------------------------------====Q4====-----------------------------------------------------
+
+
+MariaDB [guest_house]> select room.hotelno,roomno,hotelname from hotel NATURAL JOIN room
+    ->  NATURAL JOIN booking
+    -> WHERE datefrom >= '2005-01-01'
+    -> AND datefrom <= '2010-12-30'
+    -> ;
++---------+--------+-----------+
+| hotelno | roomno | hotelname |
++---------+--------+-----------+
+| dc01    |   1001 | Latham    |
++---------+--------+-----------+
+1 row in set (0.002 sec)
+
+
+
+---------------------------------------------====Q5====-----------------------------------------------------
+
+
+
+MariaDB [guest_house]> select room.hotelno,roomno,hotelname from hotel NATURAL JOIN room
+    -> WHERE price = (select MAX(price) from room WHERE type = 'single' AND price <
+    -> (select MAX(price) from room WHERE type = 'single' AND price <
+    -> (select MAX(price) from room WHERE type = 'single' )));
++---------+--------+-----------+
+| hotelno | roomno | hotelname |
++---------+--------+-----------+
+| fb01    |    501 | Grosvenor |
++---------+--------+-----------+
+1 row in set (0.001 sec)
+
+
+
+
+
+---------------------------------------------====Q6====-----------------------------------------------------
+
+
+
+MariaDB [guest_house]> select hotel.hotelno,hotelname,type from hotel
+    -> NATURAL JOIN room WHERE type IN ('double','family');
++---------+---------------+--------+
+| hotelno | hotelname     | type   |
++---------+---------------+--------+
+| ch01    | Omni Shoreham | family |
+| ch02    | Phoenix Park  | double |
+| dc01    | Latham        | double |
+| dc01    | Latham        | family |
+| fb01    | Grosvenor     | double |
+| fb01    | Grosvenor     | family |
+| fb02    | Watergate     | double |
++---------+---------------+--------+
+7 rows in set (0.001 sec)
+
+
+
+
+
+
+---------------------------------------------====Q7====-----------------------------------------------------
+
+
+
+MariaDB [guest_house]> select hotel.hotelno,hotelname,type from hotel
+    -> NATURAL JOIN room WHERE type NOT IN ('family');
++---------+---------------+--------+
+| hotelno | hotelname     | type   |
++---------+---------------+--------+
+| ch01    | Omni Shoreham | single |
+| ch02    | Phoenix Park  | single |
+| ch02    | Phoenix Park  | double |
+| dc01    | Latham        | single |
+| dc01    | Latham        | double |
+| fb01    | Grosvenor     | single |
+| fb01    | Grosvenor     | double |
+| fb02    | Watergate     | single |
+| fb02    | Watergate     | double |
++---------+---------------+--------+
+9 rows in set (0.001 sec)
+
+
+
+
+
+---------------------------------------------====Q8====-----------------------------------------------------
+
+
+
+MariaDB [guest_house]> select room.hotelno,hotelname,type,price from hotel
+    ->  NATURAL JOIN room where price < 40 ORDER BY price ASC;
++---------+---------------+--------+-------+
+| hotelno | hotelname     | type   | price |
++---------+---------------+--------+-------+
+| ch02    | Phoenix Park  | single | 10.00 |
+| ch02    | Phoenix Park  | double | 15.00 |
+| dc01    | Latham        | single | 18.00 |
+| fb01    | Grosvenor     | single | 19.00 |
+| fb01    | Grosvenor     | double | 29.00 |
+| ch01    | Omni Shoreham | single | 29.99 |
+| dc01    | Latham        | double | 30.00 |
+| dc01    | Latham        | family | 35.00 |
+| fb01    | Grosvenor     | family | 39.00 |
++---------+---------------+--------+-------+
+9 rows in set (0.001 sec)
+
+
+
+
+
+---------------------------------------------====Q9====-----------------------------------------------------
+
+
+
+MariaDB [guest_house]> select hotel.hotelno,type,price from hotel
+    -> NATURAL JOIN room where hotelname = 'Grosvenor';
++---------+--------+-------+
+| hotelno | type   | price |
++---------+--------+-------+
+| fb01    | single | 19.00 |
+| fb01    | double | 29.00 |
+| fb01    | family | 39.00 |
++---------+--------+-------+
+3 rows in set (0.001 sec)
+
+
+
+
+
+---------------------------------------------====Q10====-----------------------------------------------------
+
+
+
+MariaDB [guest_house]> select DISTINCT guestno,guestname,guestaddress,hotelname
+    -> from hotel NATURAL JOIN room NATURAL JOIN booking NATURAL JOIN guest
+    -> where hotelname = 'Grosvenor';
++---------+--------------+-----------------------+-----------+
+| guestno | guestname    | guestaddress          | hotelname |
++---------+--------------+-----------------------+-----------+
+|   10001 | John Kay     | 56 High St, London    | Grosvenor |
+|   10004 | Joe Keogh    | 2 Fergus Dr, Aberdeen | Grosvenor |
+|   10005 | Carol Farrel | 6 Achray St, Glasgow  | Grosvenor |
++---------+--------------+-----------------------+-----------+
+3 rows in set (0.001 sec)
+
+
+
+
+
+---------------------------------------------====Q11====-----------------------------------------------------
+
+
+
+MariaDB [guest_house]> Select hotel.hotelno,hotel.hotelname,count(*) AS 'No of Rooms'
+    -> from hotel NATURAL JOIN room GROUP BY hotelno;
++---------+---------------+-------------+
+| hotelno | hotelname     | No of Rooms |
++---------+---------------+-------------+
+| ch01    | Omni Shoreham |           2 |
+| ch02    | Phoenix Park  |           2 |
+| dc01    | Latham        |           3 |
+| fb01    | Grosvenor     |           3 |
+| fb02    | Watergate     |           2 |
++---------+---------------+-------------+
+5 rows in set (0.004 sec)
+
+
+
+
+
+---------------------------------------------====Q12====-----------------------------------------------------
+
+
+MariaDB [guest_house]> select room.hotelno,city,roomno,type,price from hotel Natural join room where city = "London";
++---------+--------+--------+--------+-------+
+| hotelno | city   | roomno | type   | price |
++---------+--------+--------+--------+-------+
+| ch01    | London |   1001 | single | 29.99 |
+| ch01    | London |   1101 | family | 59.99 |
+| ch02    | London |    701 | single | 10.00 |
+| ch02    | London |    801 | double | 15.00 |
+| fb01    | London |    501 | single | 19.00 |
+| fb01    | London |    601 | double | 29.00 |
+| fb01    | London |    701 | family | 39.00 |
++---------+--------+--------+--------+-------+
+7 rows in set (0.000 sec)
+
+
+
